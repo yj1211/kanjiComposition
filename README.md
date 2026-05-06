@@ -42,7 +42,7 @@
 
 ### 合成樹視窗：鬱
 
-![鬱的合成樹](assets/screenshots/tree-window-feng.png)
+![鬱的合成樹](assets/screenshots/tree-window-pan.png)
 
 這張圖示範複雜漢字的合成樹呈現方式。  
 視窗上方會顯示：
