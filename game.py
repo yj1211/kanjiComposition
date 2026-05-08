@@ -16,6 +16,7 @@ class HanziFusionGame:
         "手",
         "口",
         "廿",
+        "田",
         "山",
         "女",
         "竹",
@@ -31,7 +32,6 @@ class HanziFusionGame:
         "隹",
         "雨",
         "馬",
-        "鬼",
         "魚",
         "鳥",
         "鹿",
@@ -44,10 +44,11 @@ class HanziFusionGame:
         "臣",
         "牙",
         "耳",
+        "气",
         "豸",
     ]
-    AUXILIARY_ELEMENTS = ["丨", "一", "丿", "丶", "乛", "肀", "亅", "卜", "冂", "儿", "八", "乂", "厶", "乚", "凵", "又", "乙", "幺", "丷", "阝", "辶", "力", "㐄", "立", "才", "彐", "几", "匕", "斤", "冖", "冫", "爪", "丂", "癶", "厂", "丱", "亠", "毋", "虍", "廴", "夕", "𣶒", "乀", "𠂇", "片", "臼", "匚", "く", "彑", "丯", "囟", "爿", "攴"]
-    RADICAL_ELEMENTS = ["田", "尸", "彳", "車", "足", "言", "中", "虫", "石", "禾", "王", "門", "貝", "糸", "目", "示", "米", "宀", "巾", "走", "广", "酉", "穴", "食"]
+    AUXILIARY_ELEMENTS = ["丨", "一", "丿", "丶", "乛", "肀", "亅", "卜", "冂", "儿", "八", "乂", "厶", "乚", "凵", "又", "乙", "幺", "丷", "阝", "辶", "力", "㐄", "立", "才", "彐", "几", "匕", "斤", "冖", "冫", "爪", "丂", "癶", "厂", "丱", "亠", "毋", "虍", "廴", "夕", "𣶒", "乀", "𠂇", "片", "臼", "匚", "く", "彑", "丯", "囟", "爿", "攴", "疒", "匸"]
+    RADICAL_ELEMENTS = ["尸", "彳", "車", "足", "言", "中", "虫", "石", "禾", "王", "門", "貝", "糸", "目", "示", "米", "宀", "巾", "走", "广", "酉", "穴", "食"]
     STARTERS = BASIC_ELEMENTS + AUXILIARY_ELEMENTS
 
     def __init__(self, root: tk.Tk) -> None:
@@ -58,19 +59,23 @@ class HanziFusionGame:
 
         self.recipe_entries, self.recipes = self._build_recipes()
         self.result_to_ingredients = self._build_result_to_ingredients()
+        self.ingredient_to_results = self._build_ingredient_to_results()
         self.unlocked = set(self.STARTERS)
         self.discovery_order = list(self.STARTERS)
         self.target_characters = self._build_target_characters()
         self.catalog_sections = self._build_catalog_sections()
         self.catalog_window: tk.Toplevel | None = None
         self.tree_window: tk.Toplevel | None = None
+        self.promotion_window: tk.Toplevel | None = None
 
         self.input_var = tk.StringVar()
         self.result_var = tk.StringVar(
-            value="請輸入兩個到十個已解鎖的漢字，例如：糸言糸、宀舄、食反、穴𢆶言長馬長月刀心辶"
+            value="請輸入兩個到十個已解鎖的漢字開始合成。"
         )
         self.progress_var = tk.StringVar()
         self.tree_mode_var = tk.BooleanVar(value=False)
+        self.promotion_mode_var = tk.BooleanVar(value=False)
+        self.catalog_jump_var = tk.StringVar()
 
         self._build_ui()
         self._refresh_unlocked_display()
@@ -134,7 +139,6 @@ class HanziFusionGame:
             (("田", "木"), "果"),
             (("田", "心"), "思"),
             (("廿", "田"), "苗"),
-            (("口", "十"), "田"),
             (("口", "十"), "古"),
             (("口", "口"), "吅"),
             (("口", "口"), "回"),
@@ -300,7 +304,6 @@ class HanziFusionGame:
             (("車", "甫"), "輔"),
             (("卜", "口", "人"), "足"),
             (("土", "卜", "人"), "走"),
-            (("卜", "一", "一", "口"), "言"),
             (("言", "十"), "計"),
             (("言", "丁"), "訂"),
             (("言", "古"), "詁"),
@@ -356,7 +359,6 @@ class HanziFusionGame:
             (("廿", "日", "大"), "莫"),
             (("廿", "田", "禸"), "萬"),
             (("廿", "魚", "禾"), "蘇"),
-            (("卜", "允"), "充"),
             (("卜", "乂"), "文"),
             (("糸", "充"), "統"),
             (("丿", "口", "廿"), "囪"),
@@ -369,7 +371,6 @@ class HanziFusionGame:
             (("卜", "口", "子"), "享"),
             (("勹", "丿", "丿"), "勿"),
             (("勿", "丶"), "匆"),
-            (("木", "日", "一", "勿"), "楊"),
             (("日", "勿"), "易"),
             (("足", "易"), "踢"),
             (("厶", "儿"), "允"),
@@ -502,7 +503,6 @@ class HanziFusionGame:
             (("父", "巴"), "爸"),
             (("父", "斤"), "斧"),
             (("甫", "寸"), "尃"),
-            (("丰", "丰", "彐", "心"), "慧"),
             (("厶", "冂"), "禸"),
             (("冂", "土"), "冉"),
             (("冫", "馬"), "馮"),
@@ -604,7 +604,6 @@ class HanziFusionGame:
             (("丶", "厂"), "广"),
             (("厂", "猒"), "厭"),
             (("厭", "土"), "壓"),
-            (("广", "倠", "心"), "應"),
             (("又", "又", "又", "又"), "叕"),
             (("耳", "又"), "取"),
             (("耳", "門"), "聞"),
@@ -621,7 +620,6 @@ class HanziFusionGame:
             (("广", "坐"), "座"),
             (("人", "十", "山"), "缶"),
             (("辶", "月", "缶"), "遙"),
-            (("博", "手"), "搏"),
             (("攸", "心"), "悠"),
             (("攸", "犬"), "倏"),
             (("攸", "彡"), "修"),
@@ -882,8 +880,7 @@ class HanziFusionGame:
             (("心", "春"), "惷"),
             (("木", "奉"), "棒"),
             (("木", "秦"), "榛"),
-            (("心", "舒"), "恕"),
-            (("心", "舍"), "恕"),
+            (("如", "心"), "恕"),
             (("糸", "氏"), "紙"),
             (("人", "右"), "佑"),
             (("糸", "賓"), "繽"),
@@ -991,7 +988,8 @@ class HanziFusionGame:
             (("穴", "弓"), "穹"),
             (("穴", "九"), "究"),
             (("手", "專"), "摶"),
-            (("心", "惠"), "慧"),
+            (("丰", "丰", "彐"), "彗"),
+            (("彗", "心"), "慧"),
             (("阝", "夌"), "陵"),
             (("手", "崔"), "摧"),
             (("火", "華"), "燁"),
@@ -1244,7 +1242,6 @@ class HanziFusionGame:
             (("尗", "又"), "叔"),
             (("又", "又", "又"), "叒"),
             (("叒", "木"), "桑"),
-            (("丶", "𠂇", "乚"), "尤"),
             (("廿", "丷"), "业"),
             (("丵", "取"), "叢"),
             (("丵", "木"), "業"),
@@ -1436,6 +1433,374 @@ class HanziFusionGame:
             (("水", "留"), "溜"),
             (("虫", "枼"), "蝶"),
             (("廿", "黎"), "藜"),
+            (("丿", "田", "儿", "厶"), "鬼"),
+            (("亠", "一", "一", "口"), "言"),
+            (("亠", "厶"), "𠫓"),
+            (("𠫓", "儿"), "充"),
+            (("𠫓", "廿", "木"), "棄"),
+            (("𠫓", "月"), "育"),
+            (("𠫓", "川"), "㐬"),
+            (("水", "㐬"), "流"),
+            (("斤", "斤"), "斦"),
+            (("斦", "貝"), "質"),
+            (("刀", "丶"), "刃"),
+            (("刃", "心"), "忍"),
+            (("言", "忍"), "認"),
+            (("毋", "冫"), "母"),
+            (("人", "母"), "每"),
+            (("每", "㐬"), "毓"),
+            (("食", "人", "巾"), "飾"),
+            (("立", "口"), "咅"),
+            (("咅", "阝"), "部"),
+            (("木", "公"), "松"),
+            (("髟", "松"), "鬆"),
+            (("糸", "堯"), "繞"),
+            (("韋", "刃"), "韌"),
+            (("勹", "厂"), "厃"),
+            (("厃", "巳"), "危"),
+            (("厃", "八", "言"), "詹"),
+            (("目", "詹"), "瞻"),
+            (("人", "八"), "介"),
+            (("田", "介"), "界"),
+            (("敝", "廿"), "蔽"),
+            (("敝", "廿"), "弊"),
+            (("白", "小", "彡"), "㣎"),
+            (("禾", "㣎"), "穆"),
+            (("大", "丷", "日", "小"), "尞"),
+            (("宀", "尞"), "寮"),
+            (("木", "西"), "栖"),
+            (("原", "頁"), "願"),
+            (("天", "心"), "忝"),
+            (("舌", "忝"), "舔"),
+            (("罒", "幸"), "睪"),
+            (("釆", "睪"), "釋"),
+            (("雨", "而"), "需"),
+            (("牛", "巾", "刀"), "制"),
+            (("制", "衣"), "製"),
+            (("日", "一", "勿"), "昜"),
+            (("木", "昜"), "楊"),
+            (("疒", "昜"), "瘍"),
+            (("人", "匽"), "偃"),
+            (("阝", "昜"), "陽"),
+            (("乛", "卜", "人"), "疋"),
+            (("疋", "虫"), "蛋"),
+            (("㫃", "疋"), "旋"),
+            (("王", "旋"), "璇"),
+            (("每", "攵"), "敏"),
+            (("爪", "尹", "亅"), "爭"),
+            (("青", "爭"), "靜"),
+            (("㫃", "子"), "斿"),
+            (("水", "斿"), "游"),
+            (("丨", "王", "王", "亅"), "鬥"),
+            (("丿", "廿"), "升"),
+            (("一", "乚", "人", "升", "乚", "人"), "飛"),
+            (("糸", "刀", "巴"), "絕"),
+            (("肀", "土", "火", "皿"), "盡"),
+            (("乛", "丶", "用"), "甬"),
+            (("廿", "一", "丿", "用"), "𤰇"),
+            (("人", "𤰇"), "備"),
+            (("勹", "甫"), "匍"),
+            (("廿", "匍"), "葡"),
+            (("廿", "匋"), "萄"),
+            (("林", "疋"), "楚"),
+            (("疋", "㐬"), "疏"),
+            (("享", "丸"), "孰"),
+            (("孰", "火"), "熟"),
+            (("肰", "火"), "然"),
+            (("火", "然"), "燃"),
+            (("支", "羽"), "翅"),
+            (("戶", "隹"), "雇"),
+            (("雇", "頁"), "顧"),
+            (("千", "廿", "土"), "垂"),
+            (("垂", "阝"), "郵"),
+            (("土", "口", "丿", "人", "人"), "袁"),
+            (("自", "穴", "方"), "臱"),
+            (("辶", "臱"), "邊"),
+            (("人", "人", "人"), "乑"),
+            (("罒", "乑", "乑"), "眾"),
+            (("取", "乑"), "聚"),
+            (("或", "丿", "丿"), "彧"),
+            (("戌", "口"), "咸"),
+            (("咸", "心"), "感"),
+            (("禾", "女"), "委"),
+            (("山", "魏"), "巍"),
+            (("口", "卜", "卜", "乛", "一", "又"), "叚"),
+            (("虫", "叚"), "蝦"),
+            (("人", "乛", "一", "矢"), "侯"),
+            (("侯", "丨"), "候"),
+            (("廿", "北", "口", "火"), "燕"),
+            (("乚", "乛", "大"), "夨"),
+            (("口", "夨"), "吳"),
+            (("行", "韋"), "衛"),
+            (("馮", "心"), "憑"),
+            (("厂", "倠"), "雁"),
+            (("广", "倠"), "䧹"),
+            (("䧹", "心"), "應"),
+            (("䧹", "鳥"), "鷹"),
+            (("䧹", "月"), "膺"),
+            (("冖", "隹"), "隺"),
+            (("石", "隺"), "確"),
+            (("中", "一", "口", "丨", "口"), "𠳋"),
+            (("辶", "𠳋"), "遣"),
+            (("丨", "一", "丶", "人"), "以"),
+            (("虍", "吳"), "虞"),
+            (("丂", "口", "水", "一"), "亟"),
+            (("木", "亟"), "極"),
+            (("爪", "罒", "日", "厶", "寸"), "爵"),
+            (("臼", "丨", "又"), "叟"),
+            (("厶", "厶"), "厸"),
+            (("一", "厸", "一", "日"), "晉"),
+            (("不", "一"), "丕"),
+            (("毋", "中", "女"), "婁"),
+            (("婁", "攵"), "數"),
+            (("丨", "丨", "弓"), "弗"),
+            (("弗", "貝"), "費"),
+            (("廿", "𠂤", "辛"), "薛"),
+            (("薛", "子"), "孽"),
+            (("广", "翏"), "廖"),
+            (("匚", "丨", "口", "丨"), "𦣞"),
+            (("𦣞", "頁"), "頤"),
+            (("勹", "冂", "人", "大"), "奐"),
+            (("勹", "冂", "人", "目", "攵"), "敻"),
+            (("𠂇", "乚"), "尢"),
+            (("尢", "丶"), "尤"),
+            (("尢", "力"), "𡯄"),
+            (("手", "𡯄"), "拋"),
+            (("尢", "監"), "尷"),
+            (("㐄", "乚"), "旡"),
+            (("旡", "旡", "日"), "朁"),
+            (("水", "朁"), "潛"),
+            (("日", "厶", "旡"), "既"),
+            (("朁", "䖵"), "蠶"),
+            (("刃", "刃", "止", "止"), "歰"),
+            (("水", "歰"), "澀"),
+            (("土", "昜"), "場"),
+            (("水", "昜"), "湯"),
+            (("月", "昜"), "腸"),
+            (("木", "甬"), "桶"),
+            (("水", "甬"), "涌"),
+            (("木", "危"), "桅"),
+            (("言", "危"), "詭"),
+            (("水", "咸"), "減"),
+            (("言", "每"), "誨"),
+            (("水", "每"), "海"),
+            (("木", "每"), "梅"),
+            (("心", "每"), "悔"),
+            (("人", "咅"), "倍"),
+            (("咅", "刀"), "剖"),
+            (("足", "甬"), "踊"),
+            (("言", "甬"), "誦"),
+            (("木", "㐬"), "梳"),
+            (("廿", "委"), "萎"),
+            (("人", "雇"), "僱"),
+            (("㫃", "其"), "旗"),
+            (("口", "曷"), "喝"),
+            (("水", "曷"), "渴"),
+            (("石", "㐬"), "硫"),
+            (("竹", "監"), "籃"),
+            (("金", "監"), "鑑"),
+            (("水", "監"), "濫"),
+            (("犬", "侯"), "猴"),
+            (("口", "咸"), "喊"),
+            (("辶", "甬"), "通"),
+            (("力", "甬"), "勇"),
+            (("疒", "甬"), "痛"),
+            (("王", "㐬"), "琉"),
+            (("言", "曷"), "謁"),
+            (("木", "監"), "檻"),
+            (("舟", "監"), "艦"),
+            (("阝", "鬲"), "隔"),
+            (("虫", "鬲"), "融"),
+            (("木", "既"), "概"),
+            (("水", "既"), "溉"),
+            (("水", "戔"), "淺"),
+            (("食", "戔"), "餞"),
+            (("足", "戔"), "踐"),
+            (("歹", "戔"), "殘"),
+            (("戔", "皿"), "盞"),
+            (("貝", "戔"), "賤"),
+            (("弜", "百"), "弼"),
+            (("人", "昌"), "倡"),
+            (("女", "昌"), "娼"),
+            (("犬", "昌"), "猖"),
+            (("缶", "本"), "缽"),
+            (("甘", "木"), "某"),
+            (("水", "甘"), "泔"),
+            (("广", "廿", "火"), "庶"),
+            (("广", "廿", "巾"), "席"),
+            (("酉", "甘"), "酣"),
+            (("甘", "阝"), "邯"),
+            (("金", "甘"), "鉗"),
+            (("山", "甘", "欠"), "嵌"),
+            (("女", "冓"), "媾"),
+            (("木", "冓"), "構"),
+            (("水", "冓"), "溝"),
+            (("竹", "冓"), "篝"),
+            (("言", "冓"), "講"),
+            (("貝", "冓"), "購"),
+            (("多", "句"), "夠"),
+            (("土", "亘"), "垣"),
+            (("女", "亘"), "姮"),
+            (("一", "月", "一"), "亙"),
+            (("心", "亙"), "恆"),
+            (("一", "田", "一", "田", "一"), "畺"),
+            (("弓", "土", "畺"), "疆"),
+            (("人", "畺"), "僵"),
+            (("廿", "畺"), "薑"),
+            (("弓", "畺"), "彊"),
+            (("歹", "畺"), "殭"),
+            (("人", "會"), "儈"),
+            (("會", "刀"), "劊"),
+            (("木", "會"), "檜"),
+            (("火", "會"), "燴"),
+            (("廿", "會"), "薈"),
+            (("糸", "會"), "繪"),
+            (("月", "會"), "膾"),
+            (("水", "敫"), "激"),
+            (("戶", "犬"), "戾"),
+            (("水", "戾"), "淚"),
+            (("木", "敫"), "檄"),
+            (("辶", "敫"), "邀"),
+            (("水", "尃"), "溥"),
+            (("廿", "溥"), "薄"),
+            (("十", "一"), "士"),
+            (("人", "尃"), "傅"),
+            (("手", "尃"), "搏"),
+            (("竹", "溥"), "簿"),
+            (("糸", "尃"), "縛"),
+            (("心", "罒", "方"), "愣"),
+            (("木", "罒", "方"), "楞"),
+            (("尃", "攵"), "敷"),
+            (("士", "放"), "敖"),
+            (("人", "敖"), "傲"),
+            (("辶", "敖"), "遨"),
+            (("敖", "火"), "熬"),
+            (("辶", "斿"), "遊"),
+            (("口", "奐"), "喚"),
+            (("手", "奐"), "換"),
+            (("水", "奐"), "渙"),
+            (("火", "奐"), "煥"),
+            (("疒", "奐"), "瘓"),
+            (("一", "人", "冂"), "丙"),
+            (("疒", "丙"), "病"),
+            (("王", "敻"), "瓊"),
+            (("水", "帶"), "滯"),
+            (("女", "愛"), "嬡"),
+            (("人", "愛"), "僾"),
+            (("日", "愛"), "曖"),
+            (("一", "丿", "月", "冖", "心", "夂"), "憂"),
+            (("秋", "心"), "愁"),
+            (("幸", "丸"), "執"),
+            (("衣", "埶"), "褻"),
+            (("糸", "丸"), "紈"),
+            (("敝", "死"), "斃"),
+            (("廿", "廿", "廿", "廿"), "茻"),
+            (("茻", "死"), "葬"),
+            (("茻", "犬"), "莽"),
+            (("廿", "罒", "冖", "死"), "薨"),
+            (("戌", "女"), "威"),
+            (("人", "憂"), "優"),
+            (("尸", "二"), "𡰥"),
+            (("𡰥", "小", "寸"), "尉"),
+            (("尉", "心"), "慰"),
+            (("言", "賣"), "讀"),
+            (("尸", "廿", "一", "人", "人"), "展"),
+            (("匸", "品"), "區"),
+            (("水", "區"), "漚"),
+            (("區", "欠"), "歐"),
+            (("手", "區"), "摳"),
+            (("門", "品"), "闆"),
+            (("北", "月"), "背"),
+            (("戶", "邑"), "扈"),
+            (("水", "扈"), "滬"),
+            (("尸", "匕"), "尼"),
+            (("勹", "小"), "尔"),
+            (("人", "尔"), "你"),
+            (("品", "山"), "嵒"),
+            (("疒", "嵒"), "癌"),
+            (("申", "昜"), "暢"),
+            (("手", "奄"), "掩"),
+            (("水", "奄"), "淹"),
+            (("人", "申"), "伸"),
+            (("土", "申"), "坤"),
+            (("石", "申"), "砷"),
+            (("气", "巠"), "氫"),
+            (("巠", "力"), "勁"),
+            (("巠", "頁"), "頸"),
+            (("疒", "巠"), "痙"),
+            (("廿", "巠"), "莖"),
+            (("車", "巠"), "輕"),
+            (("予", "象"), "豫"),
+            (("血", "蔑"), "衊"),
+            (("心", "血"), "恤"),
+            (("殸", "香"), "馨"),
+            (("殸", "石"), "磬"),
+            (("刑", "土"), "型"),
+            (("丕", "阝"), "邳"),
+            (("女", "某"), "媒"),
+            (("火", "某"), "煤"),
+            (("言", "某"), "謀"),
+            (("木", "丙"), "柄"),
+            (("火", "丙"), "炳"),
+            (("亨", "火"), "烹"),
+            (("言", "咨"), "諮"),
+            (("君", "阝"), "郡"),
+            (("穴", "君"), "窘"),
+            (("手", "犮"), "拔"),
+            (("食", "肴"), "餚"),
+            (("山", "肴"), "崤"),
+            (("丿", "乀"), "入"),
+            (("入", "冂"), "內"),
+            (("金", "里"), "鋰"),
+            (("土", "厶"), "去"),
+            (("水", "去"), "法"),
+            (("去", "力"), "劫"),
+            (("土", "亢"), "坑"),
+            (("木", "亢"), "杭"),
+            (("阝", "亢"), "阬"),
+            (("骨", "亢"), "骯"),
+            (("區", "殳"), "毆"),
+            (("白", "一", "亅"), "𠂣"),
+            (("𠂣", "殳"), "殷"),
+            (("金", "內"), "鈉"),
+            (("金", "甲"), "鉀"),
+            (("正", "亅"), "丐"),
+            (("去", "皿"), "盍"),
+            (("石", "盍"), "磕"),
+            (("廿", "盍"), "蓋"),
+            (("豐", "盍"), "豔"),
+            (("門", "盍"), "闔"),
+            (("骨", "殳"), "骰"),
+            (("言", "殳"), "設"),
+            (("㱿", "禾"), "穀"),
+            (("立", "豕"), "豙"),
+            (("豙", "殳"), "毅"),
+            (("人", "寺"), "侍"),
+            (("竹", "寺"), "等"),
+            (("牛", "寺"), "特"),
+            (("疒", "寺"), "痔"),
+            (("彳", "寺"), "待"),
+            (("日", "寺"), "時"),
+            (("單", "戈"), "戰"),
+            (("周", "隹"), "雕"),
+            (("芻", "阝"), "鄒"),
+            (("芻", "皮"), "皺"),
+            (("芻", "隹"), "雛"),
+            (("自", "木"), "臬"),
+            (("金", "臬"), "鎳"),
+            (("廿", "函"), "菡"),
+            (("宀", "谷"), "容"),
+            (("木", "容"), "榕"),
+            (("廿", "容"), "蓉"),
+            (("僉", "刀"), "劍"),
+            (("手", "僉"), "撿"),
+            (("鹵", "僉"), "鹼"),
+            (("人", "僉"), "儉"),
+            (("僉", "攵"), "斂"),
+            (("月", "僉"), "臉"),
+            (("木", "區"), "樞"),
+            (("言", "區"), "謳"),
+            (("山", "區"), "嶇"),
             (("言", "式"), "試"),
             (("手", "差"), "搓"),
             (("木", "告"), "梏"),
@@ -1456,6 +1821,15 @@ class HanziFusionGame:
         for ingredients, result in self.recipe_entries:
             result_to_ingredients.setdefault(result, []).append(ingredients)
         return result_to_ingredients
+
+    def _build_ingredient_to_results(self) -> dict[str, list[str]]:
+        ingredient_to_results: dict[str, list[str]] = {}
+        for ingredients, result in self.recipe_entries:
+            for ingredient in ingredients:
+                ingredient_to_results.setdefault(ingredient, [])
+                if result not in ingredient_to_results[ingredient]:
+                    ingredient_to_results[ingredient].append(result)
+        return ingredient_to_results
 
     def _build_target_characters(self) -> set[str]:
         targets = set(self.STARTERS)
@@ -1555,14 +1929,8 @@ class HanziFusionGame:
         )
         title.pack(pady=(18, 8))
 
-        subtitle = tk.Label(
-            self.root,
-            text="從金木水火土日月人心手口廿山女竹戈十大弓刀勹牛羊羽隹雨馬鬼魚鳥鹿麥麻龍衣豕方臣牙耳出發，輔助元素有丨一丿丶乛肀亅卜冂儿八乂厶乚凵又乙幺丷阝辶力㐄立才彐几匕斤冖冫爪丂癶厂丱亠毋虍廴夕𣶒乀𠂇片臼匚く彑丯囟爿攴，部首元素有田尸彳車足言中虫石禾王門貝糸目示米宀巾走广酉穴食",
-            font=("Microsoft JhengHei UI", 11),
-            bg="#f6efe3",
-            fg="#7a6854",
-        )
-        subtitle.pack(pady=(0, 14))
+        spacer = tk.Frame(self.root, bg="#f6efe3", height=10)
+        spacer.pack()
 
         input_frame = tk.LabelFrame(
             self.root,
@@ -1575,22 +1943,13 @@ class HanziFusionGame:
         )
         input_frame.pack(fill="x", padx=20, pady=(8, 12))
 
-        instruction = tk.Label(
-            input_frame,
-            text="輸入兩個到十個字，例如：丷一屮、冂一一、巳巳共、月关",
-            font=("Microsoft JhengHei UI", 11),
-            bg="#fffaf1",
-            fg="#6f5c47",
-        )
-        instruction.pack(anchor="w", pady=(0, 10))
-
         entry = ttk.Entry(
             input_frame,
             textvariable=self.input_var,
             font=("Microsoft JhengHei UI", 16),
             justify="center",
         )
-        entry.pack(fill="x", ipady=8)
+        entry.pack(fill="x", ipady=8, pady=(2, 0))
         entry.focus()
         entry.bind("<Return>", self._handle_enter)
 
@@ -1700,12 +2059,42 @@ class HanziFusionGame:
         )
         legend.pack()
 
+        mode_row = tk.Frame(self.catalog_window, bg="#f6efe3")
+        mode_row.pack(pady=(8, 0))
+
         tree_mode_check = ttk.Checkbutton(
-            self.catalog_window,
+            mode_row,
             text="合成樹模式",
             variable=self.tree_mode_var,
+            command=self._toggle_tree_mode,
         )
-        tree_mode_check.pack(pady=(8, 0))
+        tree_mode_check.pack(side="left", padx=(0, 12))
+
+        promotion_mode_check = ttk.Checkbutton(
+            mode_row,
+            text="推廣模式",
+            variable=self.promotion_mode_var,
+            command=self._toggle_promotion_mode,
+        )
+        promotion_mode_check.pack(side="left")
+
+        jump_label = tk.Label(
+            mode_row,
+            text="定位：",
+            font=("Microsoft JhengHei UI", 10),
+            bg="#f6efe3",
+            fg="#6f5c47",
+        )
+        jump_label.pack(side="left", padx=(14, 4))
+
+        jump_entry = ttk.Entry(
+            mode_row,
+            textvariable=self.catalog_jump_var,
+            width=6,
+            justify="center",
+        )
+        jump_entry.pack(side="left")
+        jump_entry.bind("<Return>", self._jump_to_catalog_character)
 
         catalog_frame = tk.Frame(self.catalog_window, bg="#fffaf1")
         catalog_frame.pack(fill="both", expand=True, padx=20, pady=(12, 20))
@@ -1782,6 +2171,7 @@ class HanziFusionGame:
         for column in range(columns):
             self.catalog_grid.grid_columnconfigure(column, weight=1)
 
+        self.catalog_grid.update_idletasks()
         self._refresh_catalog_display()
 
     def _close_catalog(self) -> None:
@@ -1812,7 +2202,43 @@ class HanziFusionGame:
         total_count = len(self.target_characters)
         self.progress_var.set(f"已收集 {unlocked_count} / {total_count}")
 
+    def _jump_to_catalog_character(self, _event: tk.Event | None = None) -> None:
+        character = self.catalog_jump_var.get().strip()
+        if len(character) != 1:
+            self.result_var.set("請在定位欄輸入單一漢字。")
+            return
+
+        if not hasattr(self, "catalog_labels") or character not in self.catalog_labels:
+            self.result_var.set(f"圖鑑裡找不到 {character}。")
+            return
+
+        self.catalog_grid.update_idletasks()
+        self.catalog_canvas.update_idletasks()
+        label = self.catalog_labels[character]
+        scrollregion = self.catalog_canvas.bbox("all")
+        canvas_height = self.catalog_canvas.winfo_height()
+        canvas_height = self.catalog_canvas.winfo_height()
+        label_y = label.winfo_y()
+
+        if scrollregion is None:
+            self.catalog_canvas.yview_moveto(0)
+        else:
+            _, top_y, _, bottom_y = scrollregion
+            scroll_height = max(bottom_y - top_y, 1)
+            max_offset = max(scroll_height - canvas_height, 0)
+            target_offset = min(max(label_y - 20, 0), max_offset)
+            target_fraction = target_offset / scroll_height
+            max_fraction = max_offset / scroll_height if scroll_height else 0
+            self.catalog_canvas.yview_moveto(min(target_fraction, max_fraction))
+
+        self.result_var.set(f"已跳到 {character} 所在的位置。")
+        label.focus_force()
+
     def _pick_catalog_character(self, character: str) -> None:
+        if self.promotion_mode_var.get():
+            self._show_promotion_tree(character)
+            return
+
         if self.tree_mode_var.get():
             self._show_recipe_tree(character)
             return
@@ -1828,6 +2254,14 @@ class HanziFusionGame:
 
         self.input_var.set(current_text + character)
         self.root.focus_force()
+
+    def _toggle_tree_mode(self) -> None:
+        if self.tree_mode_var.get():
+            self.promotion_mode_var.set(False)
+
+    def _toggle_promotion_mode(self) -> None:
+        if self.promotion_mode_var.get():
+            self.tree_mode_var.set(False)
 
     def _show_recipe_tree(self, character: str) -> None:
         tree_text = self._build_recipe_tree_text(character)
@@ -1963,6 +2397,167 @@ class HanziFusionGame:
         if not ingredients:
             return f"{character} 目前沒有已知配方。"
         return f"推薦主配方：{' + '.join(ingredients)} = {character}"
+
+    def _show_promotion_tree(self, character: str) -> None:
+        promotion_text = self._build_promotion_tree_text(character)
+        direct_results = self.ingredient_to_results.get(character, [])
+        total_results = self._collect_promotion_descendants(character)
+        self.result_var.set(f"{character} 的推廣樹已開啟。")
+
+        if self.promotion_window is not None and self.promotion_window.winfo_exists():
+            self.promotion_window.destroy()
+
+        self.promotion_window = tk.Toplevel(self.root)
+        self.promotion_window.title(f"{character} 的推廣樹")
+        self.promotion_window.geometry("460x560")
+        self.promotion_window.resizable(False, False)
+        self.promotion_window.configure(bg="#efe4d2")
+        self.promotion_window.transient(self.root)
+
+        header_card = tk.Frame(
+            self.promotion_window,
+            bg="#fff8ef",
+            highlightbackground="#d9c3a7",
+            highlightthickness=1,
+        )
+        header_card.pack(fill="x", padx=18, pady=(18, 12))
+
+        title_row = tk.Frame(header_card, bg="#fff8ef")
+        title_row.pack(fill="x", padx=16, pady=(14, 8))
+
+        title = tk.Label(
+            title_row,
+            text=f"{character} 的推廣樹",
+            font=("Microsoft JhengHei UI", 20, "bold"),
+            bg="#fff8ef",
+            fg="#5b3d26",
+        )
+        title.pack(side="left")
+
+        status_badge = tk.Label(
+            title_row,
+            text="已解鎖" if character in self.unlocked else "未解鎖",
+            font=("Microsoft JhengHei UI", 10, "bold"),
+            bg="#d8f0d2" if character in self.unlocked else "#efe2d3",
+            fg="#2f6b2f" if character in self.unlocked else "#8a5a2b",
+            padx=10,
+            pady=4,
+        )
+        status_badge.pack(side="right")
+
+        subtitle = tk.Label(
+            header_card,
+            text=f"直接可推廣：{len(direct_results)} 個字  |  全部分支共：{len(total_results)} 個字",
+            font=("Microsoft JhengHei UI", 10),
+            bg="#fff8ef",
+            fg="#7b6550",
+            anchor="w",
+        )
+        subtitle.pack(fill="x", padx=16)
+
+        hint = tk.Label(
+            header_card,
+            text="此視窗會往下展開所有可由這個字繼續組出的字。",
+            font=("Microsoft JhengHei UI", 10),
+            bg="#fff8ef",
+            fg="#9a7b5d",
+            anchor="w",
+        )
+        hint.pack(fill="x", padx=16, pady=(6, 14))
+
+        tree_card = tk.Frame(
+            self.promotion_window,
+            bg="#fffdf8",
+            highlightbackground="#d9c3a7",
+            highlightthickness=1,
+        )
+        tree_card.pack(fill="both", expand=True, padx=18, pady=(0, 12))
+
+        text_frame = tk.Frame(tree_card, bg="#fffdf8")
+        text_frame.pack(fill="both", expand=True, padx=12, pady=12)
+
+        text_widget = tk.Text(
+            text_frame,
+            font=("Consolas", 12),
+            wrap="none",
+            bg="#fffdf8",
+            fg="#2f241a",
+            relief="flat",
+            padx=14,
+            pady=14,
+            spacing1=2,
+            spacing3=2,
+        )
+        y_scrollbar = ttk.Scrollbar(text_frame, orient="vertical", command=text_widget.yview)
+        x_scrollbar = ttk.Scrollbar(tree_card, orient="horizontal", command=text_widget.xview)
+        text_widget.configure(yscrollcommand=y_scrollbar.set, xscrollcommand=x_scrollbar.set)
+
+        text_widget.pack(side="left", fill="both", expand=True)
+        y_scrollbar.pack(side="right", fill="y")
+        x_scrollbar.pack(fill="x", padx=12, pady=(0, 12))
+        text_widget.insert("1.0", promotion_text)
+        text_widget.tag_configure("root", foreground="#1f5d73", font=("Microsoft JhengHei UI", 14, "bold"))
+        text_widget.tag_add("root", "1.0", "1.end")
+        text_widget.config(state="disabled")
+
+        action_row = tk.Frame(self.promotion_window, bg="#efe4d2")
+        action_row.pack(fill="x", padx=18, pady=(0, 18))
+
+        close_button = ttk.Button(action_row, text="關閉", command=self.promotion_window.destroy)
+        close_button.pack(side="right")
+
+    def _build_promotion_tree_text(self, character: str) -> str:
+        return "\n".join(self._build_promotion_lines(character, set(), is_root=True))
+
+    def _build_promotion_lines(
+        self,
+        character: str,
+        visiting: set[str],
+        *,
+        prefix: str = "",
+        is_last: bool = True,
+        is_root: bool = False,
+    ) -> list[str]:
+        label = character if is_root else f"{prefix}{'└─ ' if is_last else '├─ '}{character}"
+
+        if character in visiting:
+            return [f"{label} (循環略過)"]
+
+        next_results = self.ingredient_to_results.get(character, [])
+        if not next_results:
+            if is_root:
+                return [character, "└─ 目前沒有可繼續推廣的字"]
+            return [label]
+
+        lines = [label]
+        next_visiting = set(visiting)
+        next_visiting.add(character)
+        next_prefix = prefix + ("   " if is_last else "│  ")
+
+        for index, result in enumerate(next_results):
+            lines.extend(
+                self._build_promotion_lines(
+                    result,
+                    next_visiting,
+                    prefix=next_prefix,
+                    is_last=index == len(next_results) - 1,
+                    is_root=False,
+                )
+            )
+        return lines
+
+    def _collect_promotion_descendants(self, character: str) -> set[str]:
+        collected: set[str] = set()
+        stack = list(self.ingredient_to_results.get(character, []))
+
+        while stack:
+            current = stack.pop()
+            if current in collected:
+                continue
+            collected.add(current)
+            stack.extend(self.ingredient_to_results.get(current, []))
+
+        return collected
 
     def _build_recipe_tree_text(self, character: str) -> str:
         return "\n".join(self._build_tree_lines(character, set(), is_root=True))
